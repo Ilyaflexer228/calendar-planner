@@ -81,6 +81,43 @@
       color: var(--text-main);
     }
 
+    .header-user-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* User Profile Badge */
+    .user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .user-badge:hover {
+      background: #e2e8f0;
+      border-color: var(--border-focus);
+      transform: translateY(-1px);
+    }
+    .user-emoji {
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+    .user-name {
+      max-width: 120px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .sync-badge {
       display: inline-flex;
       align-items: center;
@@ -296,14 +333,26 @@
       cursor: pointer;
       font-weight: 600;
       transition: transform 0.1s, filter 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
     .event-item:hover {
       transform: translateY(-1px);
       filter: brightness(0.95);
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
+    .event-emoji {
+      font-size: 0.85rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .event-title-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-    /* Modal */
+    /* Modal Backdrop */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -322,7 +371,7 @@
     .modal-card {
       background: #ffffff;
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
       border-radius: 14px;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
       overflow: hidden;
@@ -367,7 +416,7 @@
       background: #f1f5f9;
     }
 
-    #eventForm {
+    form {
       padding: 20px;
       display: flex;
       flex-direction: column;
@@ -400,6 +449,36 @@
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
 
+    /* Emoji Picker Grid */
+    .emoji-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+    .emoji-btn {
+      font-size: 1.35rem;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 4px;
+      cursor: pointer;
+      transition: all 0.12s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .emoji-btn:hover {
+      background: #e2e8f0;
+      transform: scale(1.1);
+    }
+    .emoji-btn.active {
+      background: #eff6ff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary);
+      transform: scale(1.05);
+    }
+
     .modal-actions {
       display: flex;
       align-items: center;
@@ -413,6 +492,19 @@
       align-items: center;
       gap: 8px;
       margin-left: auto;
+    }
+
+    /* Event author info in edit modal */
+    .event-author-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: #f8fafc;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     /* Toast */
@@ -456,6 +548,9 @@
         font-size: 0.72rem;
         padding: 2px 4px;
       }
+      .emoji-picker-grid {
+        grid-template-columns: repeat(5, 1fr);
+      }
     }
   </style>
 </head>
@@ -466,9 +561,18 @@
     <header class="calendar-header">
       <div class="header-left">
         <h1 class="app-title">🗓️ Календарь событий</h1>
-        <div id="syncStatus" class="sync-badge">
-          <span class="sync-dot"></span>
-          <span class="sync-text">Синхронизация...</span>
+
+        <div class="header-user-section">
+          <!-- Profile Badge (Click to edit) -->
+          <div id="userProfileBtn" class="user-badge" title="Нажмите, чтобы изменить имя или смайлик">
+            <span id="userEmojiDisplay" class="user-emoji">🚀</span>
+            <span id="userNameDisplay" class="user-name">Пользователь</span>
+          </div>
+
+          <div id="syncStatus" class="sync-badge">
+            <span class="sync-dot"></span>
+            <span class="sync-text">Синхронизация...</span>
+          </div>
         </div>
       </div>
 
@@ -501,7 +605,7 @@
     </main>
   </div>
 
-  <!-- Modal (Только название события!) -->
+  <!-- Modal: Event Add / Edit (Click on date) -->
   <div id="eventModal" class="modal-backdrop hidden" style="display: none;">
     <div class="modal-card">
       <div class="modal-header">
@@ -512,6 +616,10 @@
       <form id="eventForm">
         <input type="hidden" id="eventId">
         <input type="hidden" id="eventDate">
+
+        <div id="eventAuthorMeta" class="event-author-meta" style="display: none;">
+          <!-- Shows author info if editing -->
+        </div>
 
         <!-- Title only -->
         <div class="form-group">
@@ -531,6 +639,35 @@
     </div>
   </div>
 
+  <!-- Modal: Profile / Authorization (Name + Emoji) -->
+  <div id="authModal" class="modal-backdrop hidden" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="authModalTitle">Ваш профиль</h3>
+        <button id="btnCloseAuthModal" class="btn-close" style="display: none;">&times;</button>
+      </div>
+
+      <form id="authForm">
+        <div class="form-group">
+          <label for="authNameInput">Ваше имя:</label>
+          <input type="text" id="authNameInput" placeholder="Как вас зовут?" required autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label>Выберите ваш смайлик:</label>
+          <div id="emojiPickerGrid" class="emoji-picker-grid">
+            <!-- Populated by JS -->
+          </div>
+          <input type="hidden" id="authSelectedEmoji" value="🚀">
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px;">Войти в календарь</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Toast notification -->
   <div id="toast" class="toast hidden" style="display: none;"></div>
 
@@ -539,6 +676,13 @@
     (function() {
       const CLOUD_STORAGE_URL = 'https://kvdb.io/R4sWpSfetVkvDaeMNdAVWi/events';
       const LOCAL_STORAGE_KEY = 'simple_calendar_events_v3';
+      const USER_STORAGE_KEY = 'simple_calendar_user_profile';
+
+      const EMOJI_LIST = [
+        '🚀', '🦊', '⚡', '🦁', '🐻', '🐱',
+        '🌟', '🎮', '🎯', '🔥', '👑', '🍕',
+        '☕', '🎨', '💎', '🦄', '🍀', '🏖️'
+      ];
 
       const MONTH_NAMES = [
         'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
@@ -555,8 +699,10 @@
           this.currentDate = new Date();
           this.events = [];
           this.isSaving = false;
+          this.user = { name: '', emoji: '🚀' };
 
           this.initElements();
+          this.initAuth();
           this.bindEvents();
           this.loadEvents();
           this.render();
@@ -573,18 +719,120 @@
           this.btnToday = document.getElementById('btnToday');
           this.syncStatus = document.getElementById('syncStatus');
 
-          // Modal
+          // User Profile Elements
+          this.userProfileBtn = document.getElementById('userProfileBtn');
+          this.userEmojiDisplay = document.getElementById('userEmojiDisplay');
+          this.userNameDisplay = document.getElementById('userNameDisplay');
+
+          // Event Modal
           this.eventModal = document.getElementById('eventModal');
           this.modalTitle = document.getElementById('modalTitle');
           this.eventForm = document.getElementById('eventForm');
           this.eventIdInput = document.getElementById('eventId');
           this.eventDateInput = document.getElementById('eventDate');
           this.eventTitleInput = document.getElementById('eventTitle');
+          this.eventAuthorMeta = document.getElementById('eventAuthorMeta');
           this.btnDeleteEvent = document.getElementById('btnDeleteEvent');
           this.btnCloseModal = document.getElementById('btnCloseModal');
           this.btnCancelModal = document.getElementById('btnCancelModal');
           this.toastEl = document.getElementById('toast');
+
+          // Auth / Profile Modal
+          this.authModal = document.getElementById('authModal');
+          this.authModalTitle = document.getElementById('authModalTitle');
+          this.authForm = document.getElementById('authForm');
+          this.authNameInput = document.getElementById('authNameInput');
+          this.authSelectedEmoji = document.getElementById('authSelectedEmoji');
+          this.emojiPickerGrid = document.getElementById('emojiPickerGrid');
+          this.btnCloseAuthModal = document.getElementById('btnCloseAuthModal');
         }
+
+        // --- Auth & User Profile ---
+
+        initAuth() {
+          this.renderEmojiPicker();
+
+          try {
+            const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+            if (savedUser) {
+              this.user = JSON.parse(savedUser);
+            }
+          } catch (e) {}
+
+          if (this.user.name) {
+            this.updateUserUI();
+          } else {
+            // First time visit: show auth modal
+            this.openAuthModal(true);
+          }
+        }
+
+        renderEmojiPicker() {
+          this.emojiPickerGrid.innerHTML = '';
+          EMOJI_LIST.forEach(emoji => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'emoji-btn' + (emoji === this.user.emoji ? ' active' : '');
+            btn.textContent = emoji;
+            btn.addEventListener('click', () => {
+              this.emojiPickerGrid.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              this.authSelectedEmoji.value = emoji;
+            });
+            this.emojiPickerGrid.appendChild(btn);
+          });
+        }
+
+        updateUserUI() {
+          this.userNameDisplay.textContent = this.user.name || 'Пользователь';
+          this.userEmojiDisplay.textContent = this.user.emoji || '🚀';
+        }
+
+        openAuthModal(isFirstTime = false) {
+          this.authModalTitle.textContent = isFirstTime ? 'Добро пожаловать в календарь! 👋' : 'Настройка профиля';
+          this.authNameInput.value = this.user.name || '';
+          this.authSelectedEmoji.value = this.user.emoji || '🚀';
+
+          this.emojiPickerGrid.querySelectorAll('.emoji-btn').forEach(btn => {
+            if (btn.textContent === (this.user.emoji || '🚀')) {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
+          });
+
+          // Allow closing only if user already has a name
+          if (!isFirstTime && this.user.name) {
+            this.btnCloseAuthModal.style.display = 'block';
+          } else {
+            this.btnCloseAuthModal.style.display = 'none';
+          }
+
+          this.authModal.classList.remove('hidden');
+          this.authModal.style.display = 'flex';
+          setTimeout(() => this.authNameInput.focus(), 60);
+        }
+
+        closeAuthModal() {
+          if (!this.user.name) return; // Must enter a name first
+          this.authModal.classList.add('hidden');
+          this.authModal.style.display = 'none';
+        }
+
+        saveUserProfile(name, emoji) {
+          this.user = {
+            name: name.trim(),
+            emoji: emoji || '🚀'
+          };
+          try {
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(this.user));
+          } catch (e) {}
+          this.updateUserUI();
+          this.closeAuthModal();
+          this.showToast(`Привет, ${this.user.name}! ${this.user.emoji}`);
+        }
+
+        // --- Event Listeners ---
 
         bindEvents() {
           this.btnPrev.addEventListener('click', () => {
@@ -600,14 +848,34 @@
             this.render();
           });
 
-          // Modal controls
+          // Click user profile pill to edit
+          this.userProfileBtn.addEventListener('click', () => {
+            this.openAuthModal(false);
+          });
+
+          // Auth Form submit
+          this.authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = this.authNameInput.value;
+            const emoji = this.authSelectedEmoji.value;
+            if (name.trim()) {
+              this.saveUserProfile(name, emoji);
+            }
+          });
+
+          this.btnCloseAuthModal.addEventListener('click', () => this.closeAuthModal());
+          this.authModal.addEventListener('click', (e) => {
+            if (e.target === this.authModal && this.user.name) this.closeAuthModal();
+          });
+
+          // Event Modal controls
           this.btnCloseModal.addEventListener('click', () => this.closeModal());
           this.btnCancelModal.addEventListener('click', () => this.closeModal());
           this.eventModal.addEventListener('click', (e) => {
             if (e.target === this.eventModal) this.closeModal();
           });
 
-          // Form submit
+          // Event Form submit
           this.eventForm.addEventListener('submit', (e) => {
             e.preventDefault();
             this.handleFormSubmit();
@@ -623,7 +891,10 @@
           });
 
           window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') this.closeModal();
+            if (e.key === 'Escape') {
+              this.closeModal();
+              if (this.user.name) this.closeAuthModal();
+            }
           });
         }
 
@@ -717,7 +988,7 @@
           if (label) label.textContent = text;
         }
 
-        // --- Render ---
+        // --- Render Calendar ---
 
         render() {
           const year = this.currentDate.getFullYear();
@@ -772,8 +1043,15 @@
             dayEvents.forEach(evt => {
               const item = document.createElement('div');
               item.className = 'event-item';
-              item.textContent = evt.title;
-              item.title = evt.title;
+              
+              const emojiIcon = evt.emoji || '📌';
+              const authorText = evt.author ? ` (от ${evt.author})` : '';
+              item.title = `${evt.title}${authorText}`;
+
+              item.innerHTML = `
+                <span class="event-emoji">${emojiIcon}</span>
+                <span class="event-title-text">${this.escapeHtml(evt.title)}</span>
+              `;
 
               // Click existing event -> Edit / Delete
               item.addEventListener('click', (e) => {
@@ -785,6 +1063,10 @@
 
             // Click cell -> Add new event to this date
             cell.addEventListener('click', () => {
+              if (!this.user.name) {
+                this.openAuthModal(true);
+                return;
+              }
               this.openAddModal(dateISO, cellDate);
             });
 
@@ -792,12 +1074,13 @@
           }
         }
 
-        // --- Modals ---
+        // --- Event Modals ---
 
         openAddModal(dateISO, cellDate) {
           this.eventForm.reset();
           this.eventIdInput.value = '';
           this.eventDateInput.value = dateISO;
+          this.eventAuthorMeta.style.display = 'none';
 
           const d = cellDate || new Date(dateISO);
           this.modalTitle.textContent = `Событие на ${d.getDate()} ${MONTH_NAMES_GENITIVE[d.getMonth()]}`;
@@ -816,6 +1099,13 @@
           const d = cellDate || new Date(evt.date);
           this.modalTitle.textContent = `Редактировать (${d.getDate()} ${MONTH_NAMES_GENITIVE[d.getMonth()]})`;
           this.btnDeleteEvent.style.display = 'inline-flex';
+
+          if (evt.author) {
+            this.eventAuthorMeta.innerHTML = `<span>Автор:</span> <strong>${evt.emoji || '📌'} ${this.escapeHtml(evt.author)}</strong>`;
+            this.eventAuthorMeta.style.display = 'flex';
+          } else {
+            this.eventAuthorMeta.style.display = 'none';
+          }
 
           this.eventModal.classList.remove('hidden');
           this.eventModal.style.display = 'flex';
@@ -837,14 +1127,17 @@
           if (id) {
             const index = this.events.findIndex(e => e.id === id);
             if (index !== -1) {
-              this.events[index] = { id, date, title };
+              this.events[index].title = title;
+              this.events[index].date = date;
               this.showToast('Событие изменено');
             }
           } else {
             const newEvent = {
               id: 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
               date,
-              title
+              title,
+              author: this.user.name || 'Пользователь',
+              emoji: this.user.emoji || '🚀'
             };
             this.events.push(newEvent);
             this.showToast('Событие добавлено');
@@ -867,6 +1160,13 @@
           const month = String(d.getMonth() + 1).padStart(2, '0');
           const day = String(d.getDate()).padStart(2, '0');
           return `${year}-${month}-${day}`;
+        }
+
+        escapeHtml(str) {
+          if (!str) return '';
+          const div = document.createElement('div');
+          div.textContent = str;
+          return div.innerHTML;
         }
 
         showToast(msg) {
