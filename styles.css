@@ -188,6 +188,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
 }
 .btn-primary {
   background: var(--primary);
@@ -289,16 +290,13 @@ body {
   color: #ffffff;
 }
 
-.day-add-hint {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--primary);
-  opacity: 0;
-  transition: opacity 0.15s;
-  line-height: 1;
-}
-.day-cell:hover .day-add-hint {
-  opacity: 1;
+.day-events-count {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: #f1f5f9;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 600;
 }
 
 .events-container {
@@ -360,11 +358,14 @@ body {
 .modal-card {
   background: #ffffff;
   width: 100%;
-  max-width: 400px;
+  max-width: 440px;
   border-radius: 14px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   animation: modalEnter 0.15s ease-out;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes modalEnter {
@@ -386,7 +387,7 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .modal-header h3 {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-main);
 }
@@ -405,13 +406,136 @@ body {
   background: #f1f5f9;
 }
 
-form {
-  padding: 20px;
+.modal-body {
+  padding: 16px 20px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
+/* Day Events List inside Modal */
+.day-events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.day-event-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  gap: 10px;
+  transition: background 0.15s;
+}
+.day-event-card:hover {
+  background: #f1f5f9;
+}
+.day-event-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  min-width: 0;
+  flex: 1;
+}
+.day-event-author-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: var(--primary);
+  padding: 2px 6px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.day-event-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-main);
+  word-break: break-word;
+}
+
+.day-event-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--text-muted);
+  transition: all 0.15s;
+  line-height: 1;
+}
+.btn-icon:hover {
+  background: #e2e8f0;
+  color: var(--text-main);
+}
+.btn-icon.delete:hover {
+  background: #fee2e2;
+  color: var(--danger);
+}
+
+.empty-events-msg {
+  text-align: center;
+  padding: 24px 12px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+/* Add Event Form Inside Modal */
+.day-add-section {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  margin-top: 4px;
+}
+
+.btn-open-add {
+  width: 100%;
+  padding: 10px;
+  font-size: 0.875rem;
+}
+
+.add-event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.add-event-input-row {
+  display: flex;
+  gap: 8px;
+}
+.add-event-input-row input {
+  flex: 1;
+  font-size: 0.9375rem;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  color: var(--text-main);
+  outline: none;
+}
+.add-event-input-row input:focus {
+  background: #ffffff;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* Auth Modal Specifics */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -436,6 +560,13 @@ form {
   background: #ffffff;
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.auth-lookup-hint {
+  font-size: 0.78rem;
+  color: var(--primary);
+  font-weight: 500;
+  display: none;
 }
 
 /* Emoji Picker Grid */
@@ -466,34 +597,6 @@ form {
   border-color: var(--primary);
   box-shadow: 0 0 0 2px var(--primary);
   transform: scale(1.05);
-}
-
-.modal-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 4px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-}
-.actions-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
-}
-
-/* Event author info in edit modal */
-.event-author-meta {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  background: #f8fafc;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
 /* Toast */

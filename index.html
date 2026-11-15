@@ -199,6 +199,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
     }
     .btn-primary {
       background: var(--primary);
@@ -300,16 +301,13 @@
       color: #ffffff;
     }
 
-    .day-add-hint {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--primary);
-      opacity: 0;
-      transition: opacity 0.15s;
-      line-height: 1;
-    }
-    .day-cell:hover .day-add-hint {
-      opacity: 1;
+    .day-events-count {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      background: #f1f5f9;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-weight: 600;
     }
 
     .events-container {
@@ -371,11 +369,14 @@
     .modal-card {
       background: #ffffff;
       width: 100%;
-      max-width: 400px;
+      max-width: 440px;
       border-radius: 14px;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
       overflow: hidden;
       animation: modalEnter 0.15s ease-out;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
     }
 
     @keyframes modalEnter {
@@ -397,7 +398,7 @@
       border-bottom: 1px solid var(--border);
     }
     .modal-header h3 {
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: var(--text-main);
     }
@@ -416,13 +417,136 @@
       background: #f1f5f9;
     }
 
-    form {
-      padding: 20px;
+    .modal-body {
+      padding: 16px 20px;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
+    /* Day Events List inside Modal */
+    .day-events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .day-event-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      gap: 10px;
+      transition: background 0.15s;
+    }
+    .day-event-card:hover {
+      background: #f1f5f9;
+    }
+    .day-event-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+      min-width: 0;
+      flex: 1;
+    }
+    .day-event-author-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: var(--primary);
+      padding: 2px 6px;
+      border-radius: 12px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .day-event-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-main);
+      word-break: break-word;
+    }
+
+    .day-event-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .btn-icon {
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      color: var(--text-muted);
+      transition: all 0.15s;
+      line-height: 1;
+    }
+    .btn-icon:hover {
+      background: #e2e8f0;
+      color: var(--text-main);
+    }
+    .btn-icon.delete:hover {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    .empty-events-msg {
+      text-align: center;
+      padding: 24px 12px;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      font-style: italic;
+    }
+
+    /* Add Event Form Inside Modal */
+    .day-add-section {
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+      margin-top: 4px;
+    }
+
+    .btn-open-add {
+      width: 100%;
+      padding: 10px;
+      font-size: 0.875rem;
+    }
+
+    .add-event-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .add-event-input-row {
+      display: flex;
+      gap: 8px;
+    }
+    .add-event-input-row input {
+      flex: 1;
+      font-size: 0.9375rem;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      color: var(--text-main);
+      outline: none;
+    }
+    .add-event-input-row input:focus {
+      background: #ffffff;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    /* Auth Modal Specifics */
     .form-group {
       display: flex;
       flex-direction: column;
@@ -447,6 +571,13 @@
       background: #ffffff;
       border-color: var(--border-focus);
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .auth-lookup-hint {
+      font-size: 0.78rem;
+      color: var(--primary);
+      font-weight: 500;
+      display: none;
     }
 
     /* Emoji Picker Grid */
@@ -477,34 +608,6 @@
       border-color: var(--primary);
       box-shadow: 0 0 0 2px var(--primary);
       transform: scale(1.05);
-    }
-
-    .modal-actions {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 4px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-    }
-    .actions-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-left: auto;
-    }
-
-    /* Event author info in edit modal */
-    .event-author-meta {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      background: #f8fafc;
-      padding: 6px 10px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     /* Toast */
@@ -564,7 +667,7 @@
 
         <div class="header-user-section">
           <!-- Profile Badge (Click to edit) -->
-          <div id="userProfileBtn" class="user-badge" title="Нажмите, чтобы изменить имя или смайлик">
+          <div id="userProfileBtn" class="user-badge" title="Нажмите, чтобы изменить логин или смайлик">
             <span id="userEmojiDisplay" class="user-emoji">🚀</span>
             <span id="userNameDisplay" class="user-name">Пользователь</span>
           </div>
@@ -605,41 +708,42 @@
     </main>
   </div>
 
-  <!-- Modal: Event Add / Edit (Click on date) -->
-  <div id="eventModal" class="modal-backdrop hidden" style="display: none;">
+  <!-- Modal: Day View (Shows events for selected date + Add Button) -->
+  <div id="dayEventsModal" class="modal-backdrop hidden" style="display: none;">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 id="modalTitle">Событие</h3>
-        <button id="btnCloseModal" class="btn-close">&times;</button>
+        <h3 id="dayModalTitle">События на дату</h3>
+        <button id="btnCloseDayModal" class="btn-close">&times;</button>
       </div>
 
-      <form id="eventForm">
-        <input type="hidden" id="eventId">
-        <input type="hidden" id="eventDate">
-
-        <div id="eventAuthorMeta" class="event-author-meta" style="display: none;">
-          <!-- Shows author info if editing -->
+      <div class="modal-body">
+        <!-- Events list for this day -->
+        <div id="dayEventsList" class="day-events-list">
+          <!-- Populated by JS -->
         </div>
 
-        <!-- Title only -->
-        <div class="form-group">
-          <label for="eventTitle">Название события:</label>
-          <input type="text" id="eventTitle" placeholder="Что запланировано?" required autocomplete="off" autofocus>
-        </div>
+        <!-- Add Event Section inside Day View -->
+        <div class="day-add-section">
+          <button id="btnShowAddForm" class="btn btn-primary btn-open-add">
+            + Добавить событие
+          </button>
 
-        <!-- Actions -->
-        <div class="modal-actions">
-          <button type="button" id="btnDeleteEvent" class="btn btn-danger" style="display: none;">Удалить</button>
-          <div class="actions-right">
-            <button type="button" id="btnCancelModal" class="btn btn-outline">Отмена</button>
-            <button type="submit" class="btn btn-primary">Сохранить</button>
-          </div>
+          <!-- Form appears when "+ Добавить событие" is clicked -->
+          <form id="dayAddForm" class="add-event-form" style="display: none; padding: 0;">
+            <div class="add-event-input-row">
+              <input type="text" id="newEventTitleInput" placeholder="Название события..." required autocomplete="off">
+              <button type="submit" class="btn btn-primary">Добавить</button>
+            </div>
+            <button type="button" id="btnCancelAddEvent" class="btn btn-outline btn-sm" style="align-self: flex-start;">
+              Отмена
+            </button>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 
-  <!-- Modal: Profile / Authorization (Name + Emoji) -->
+  <!-- Modal: Profile / Authorization (Matches user by login) -->
   <div id="authModal" class="modal-backdrop hidden" style="display: none;">
     <div class="modal-card">
       <div class="modal-header">
@@ -647,10 +751,11 @@
         <button id="btnCloseAuthModal" class="btn-close" style="display: none;">&times;</button>
       </div>
 
-      <form id="authForm">
+      <form id="authForm" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
         <div class="form-group">
-          <label for="authNameInput">Ваше имя:</label>
-          <input type="text" id="authNameInput" placeholder="Как вас зовут?" required autocomplete="off">
+          <label for="authNameInput">Ваш логин (имя):</label>
+          <input type="text" id="authNameInput" placeholder="Введите имя..." required autocomplete="off">
+          <span id="authLookupHint" class="auth-lookup-hint"></span>
         </div>
 
         <div class="form-group">
@@ -661,7 +766,7 @@
           <input type="hidden" id="authSelectedEmoji" value="🚀">
         </div>
 
-        <div class="modal-actions">
+        <div class="modal-actions" style="margin-top: 4px; padding-top: 14px; border-top: 1px solid var(--border);">
           <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px;">Войти в календарь</button>
         </div>
       </form>
@@ -674,9 +779,10 @@
   <!-- Script -->
   <script>
     (function() {
-      const CLOUD_STORAGE_URL = 'https://kvdb.io/R4sWpSfetVkvDaeMNdAVWi/events';
-      const LOCAL_STORAGE_KEY = 'simple_calendar_events_v3';
-      const USER_STORAGE_KEY = 'simple_calendar_user_profile';
+      const CLOUD_EVENTS_URL = 'https://kvdb.io/R4sWpSfetVkvDaeMNdAVWi/events';
+      const CLOUD_USERS_URL  = 'https://kvdb.io/R4sWpSfetVkvDaeMNdAVWi/users';
+      const LOCAL_EVENTS_KEY = 'simple_calendar_events_v3';
+      const LOCAL_USER_KEY   = 'simple_calendar_user_profile';
 
       const EMOJI_LIST = [
         '🚀', '🦊', '⚡', '🦁', '🐻', '🐱',
@@ -698,16 +804,18 @@
         constructor() {
           this.currentDate = new Date();
           this.events = [];
+          this.knownUsers = {}; // Shared user registry: { "илья": { name: "Илья", emoji: "🚀" } }
           this.isSaving = false;
           this.user = { name: '', emoji: '🚀' };
+          this.activeDayISO = null;
 
           this.initElements();
           this.initAuth();
           this.bindEvents();
-          this.loadEvents();
+          this.loadData();
           this.render();
 
-          // Фоновая синхронизация каждые 7 секунд
+          // Фоновая синхронизация событий и пользователей каждые 7 секунд
           setInterval(() => this.fetchCloudEvents(false), 7000);
         }
 
@@ -719,41 +827,41 @@
           this.btnToday = document.getElementById('btnToday');
           this.syncStatus = document.getElementById('syncStatus');
 
-          // User Profile Elements
+          // Profile in header
           this.userProfileBtn = document.getElementById('userProfileBtn');
           this.userEmojiDisplay = document.getElementById('userEmojiDisplay');
           this.userNameDisplay = document.getElementById('userNameDisplay');
 
-          // Event Modal
-          this.eventModal = document.getElementById('eventModal');
-          this.modalTitle = document.getElementById('modalTitle');
-          this.eventForm = document.getElementById('eventForm');
-          this.eventIdInput = document.getElementById('eventId');
-          this.eventDateInput = document.getElementById('eventDate');
-          this.eventTitleInput = document.getElementById('eventTitle');
-          this.eventAuthorMeta = document.getElementById('eventAuthorMeta');
-          this.btnDeleteEvent = document.getElementById('btnDeleteEvent');
-          this.btnCloseModal = document.getElementById('btnCloseModal');
-          this.btnCancelModal = document.getElementById('btnCancelModal');
-          this.toastEl = document.getElementById('toast');
+          // Day View Modal
+          this.dayEventsModal = document.getElementById('dayEventsModal');
+          this.dayModalTitle = document.getElementById('dayModalTitle');
+          this.btnCloseDayModal = document.getElementById('btnCloseDayModal');
+          this.dayEventsList = document.getElementById('dayEventsList');
+          this.btnShowAddForm = document.getElementById('btnShowAddForm');
+          this.dayAddForm = document.getElementById('dayAddForm');
+          this.newEventTitleInput = document.getElementById('newEventTitleInput');
+          this.btnCancelAddEvent = document.getElementById('btnCancelAddEvent');
 
           // Auth / Profile Modal
           this.authModal = document.getElementById('authModal');
           this.authModalTitle = document.getElementById('authModalTitle');
           this.authForm = document.getElementById('authForm');
           this.authNameInput = document.getElementById('authNameInput');
+          this.authLookupHint = document.getElementById('authLookupHint');
           this.authSelectedEmoji = document.getElementById('authSelectedEmoji');
           this.emojiPickerGrid = document.getElementById('emojiPickerGrid');
           this.btnCloseAuthModal = document.getElementById('btnCloseAuthModal');
+
+          this.toastEl = document.getElementById('toast');
         }
 
-        // --- Auth & User Profile ---
+        // --- User Auth & Identity Matching ---
 
         initAuth() {
           this.renderEmojiPicker();
 
           try {
-            const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+            const savedUser = localStorage.getItem(LOCAL_USER_KEY);
             if (savedUser) {
               this.user = JSON.parse(savedUser);
             }
@@ -762,7 +870,6 @@
           if (this.user.name) {
             this.updateUserUI();
           } else {
-            // First time visit: show auth modal
             this.openAuthModal(true);
           }
         }
@@ -775,12 +882,21 @@
             btn.className = 'emoji-btn' + (emoji === this.user.emoji ? ' active' : '');
             btn.textContent = emoji;
             btn.addEventListener('click', () => {
-              this.emojiPickerGrid.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('active'));
-              btn.classList.add('active');
-              this.authSelectedEmoji.value = emoji;
+              this.selectEmoji(emoji);
             });
             this.emojiPickerGrid.appendChild(btn);
           });
+        }
+
+        selectEmoji(emoji) {
+          this.emojiPickerGrid.querySelectorAll('.emoji-btn').forEach(btn => {
+            if (btn.textContent === emoji) {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
+          });
+          this.authSelectedEmoji.value = emoji;
         }
 
         updateUserUI() {
@@ -792,16 +908,10 @@
           this.authModalTitle.textContent = isFirstTime ? 'Добро пожаловать в календарь! 👋' : 'Настройка профиля';
           this.authNameInput.value = this.user.name || '';
           this.authSelectedEmoji.value = this.user.emoji || '🚀';
+          this.authLookupHint.style.display = 'none';
 
-          this.emojiPickerGrid.querySelectorAll('.emoji-btn').forEach(btn => {
-            if (btn.textContent === (this.user.emoji || '🚀')) {
-              btn.classList.add('active');
-            } else {
-              btn.classList.remove('active');
-            }
-          });
+          this.selectEmoji(this.user.emoji || '🚀');
 
-          // Allow closing only if user already has a name
           if (!isFirstTime && this.user.name) {
             this.btnCloseAuthModal.style.display = 'block';
           } else {
@@ -814,95 +924,82 @@
         }
 
         closeAuthModal() {
-          if (!this.user.name) return; // Must enter a name first
+          if (!this.user.name) return;
           this.authModal.classList.add('hidden');
           this.authModal.style.display = 'none';
         }
 
-        saveUserProfile(name, emoji) {
-          this.user = {
-            name: name.trim(),
-            emoji: emoji || '🚀'
-          };
+        // Live check if user exists when typing name
+        checkExistingUser(typedName) {
+          const key = typedName.trim().toLowerCase();
+          if (this.knownUsers && this.knownUsers[key]) {
+            const existing = this.knownUsers[key];
+            this.selectEmoji(existing.emoji);
+            this.authLookupHint.textContent = `Найден профиль ${existing.emoji} ${existing.name}! Смайлик подставлен.`;
+            this.authLookupHint.style.display = 'block';
+          } else {
+            this.authLookupHint.style.display = 'none';
+          }
+        }
+
+        async saveUserProfile(name, emoji) {
+          const cleanName = name.trim();
+          const cleanEmoji = emoji || '🚀';
+          const key = cleanName.toLowerCase();
+
+          this.user = { name: cleanName, emoji: cleanEmoji };
+          
+          // Save in shared registry so anyone entering this name gets this user
+          this.knownUsers[key] = { name: cleanName, emoji: cleanEmoji };
+
           try {
-            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(this.user));
+            localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(this.user));
           } catch (e) {}
+
           this.updateUserUI();
           this.closeAuthModal();
           this.showToast(`Привет, ${this.user.name}! ${this.user.emoji}`);
+
+          // Sync users to cloud
+          this.syncUsersToCloud();
         }
 
-        // --- Event Listeners ---
+        async syncUsersToCloud() {
+          try {
+            await fetch(CLOUD_USERS_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(this.knownUsers)
+            });
+          } catch (e) {}
+        }
 
-        bindEvents() {
-          this.btnPrev.addEventListener('click', () => {
-            this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-            this.render();
-          });
-          this.btnNext.addEventListener('click', () => {
-            this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-            this.render();
-          });
-          this.btnToday.addEventListener('click', () => {
-            this.currentDate = new Date();
-            this.render();
-          });
-
-          // Click user profile pill to edit
-          this.userProfileBtn.addEventListener('click', () => {
-            this.openAuthModal(false);
-          });
-
-          // Auth Form submit
-          this.authForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = this.authNameInput.value;
-            const emoji = this.authSelectedEmoji.value;
-            if (name.trim()) {
-              this.saveUserProfile(name, emoji);
+        async loadCloudUsers() {
+          try {
+            const res = await fetch(CLOUD_USERS_URL, { cache: 'no-store' });
+            if (res.ok) {
+              const data = await res.json();
+              if (data && typeof data === 'object') {
+                this.knownUsers = data;
+                // If current user is already logged in, update emoji if cloud has newer
+                if (this.user.name) {
+                  const key = this.user.name.toLowerCase();
+                  if (this.knownUsers[key] && this.knownUsers[key].emoji) {
+                    this.user.emoji = this.knownUsers[key].emoji;
+                    this.updateUserUI();
+                  }
+                }
+              }
             }
-          });
-
-          this.btnCloseAuthModal.addEventListener('click', () => this.closeAuthModal());
-          this.authModal.addEventListener('click', (e) => {
-            if (e.target === this.authModal && this.user.name) this.closeAuthModal();
-          });
-
-          // Event Modal controls
-          this.btnCloseModal.addEventListener('click', () => this.closeModal());
-          this.btnCancelModal.addEventListener('click', () => this.closeModal());
-          this.eventModal.addEventListener('click', (e) => {
-            if (e.target === this.eventModal) this.closeModal();
-          });
-
-          // Event Form submit
-          this.eventForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleFormSubmit();
-          });
-
-          // Delete event
-          this.btnDeleteEvent.addEventListener('click', () => {
-            const id = this.eventIdInput.value;
-            if (id) {
-              this.deleteEvent(id);
-              this.closeModal();
-            }
-          });
-
-          window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-              this.closeModal();
-              if (this.user.name) this.closeAuthModal();
-            }
-          });
+          } catch (e) {}
         }
 
         // --- Storage & Sync ---
 
-        loadEvents() {
+        loadData() {
+          // Load local events
           try {
-            const local = localStorage.getItem(LOCAL_STORAGE_KEY);
+            const local = localStorage.getItem(LOCAL_EVENTS_KEY);
             if (local !== null) {
               const parsed = JSON.parse(local);
               if (Array.isArray(parsed)) {
@@ -912,6 +1009,8 @@
             }
           } catch (e) {}
 
+          // Load cloud events & users
+          this.loadCloudUsers();
           this.fetchCloudEvents(true);
         }
 
@@ -922,7 +1021,7 @@
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 4000);
 
-            const response = await fetch(CLOUD_STORAGE_URL, {
+            const response = await fetch(CLOUD_EVENTS_URL, {
               cache: 'no-store',
               signal: controller.signal
             });
@@ -945,8 +1044,13 @@
 
                 if (cloudStr !== currentStr) {
                   this.events = cloudData;
-                  localStorage.setItem(LOCAL_STORAGE_KEY, cloudStr);
+                  localStorage.setItem(LOCAL_EVENTS_KEY, cloudStr);
                   this.render();
+
+                  // Refresh open day modal if viewing
+                  if (this.activeDayISO && !this.dayEventsModal.classList.contains('hidden')) {
+                    this.renderDayEvents(this.activeDayISO);
+                  }
                 }
                 this.setSyncStatus('online', '🟢 Общий доступ (онлайн)');
                 return;
@@ -963,12 +1067,12 @@
           const jsonStr = JSON.stringify(this.events);
 
           try {
-            localStorage.setItem(LOCAL_STORAGE_KEY, jsonStr);
+            localStorage.setItem(LOCAL_EVENTS_KEY, jsonStr);
           } catch (e) {}
 
           try {
             this.setSyncStatus('syncing', 'Сохранение...');
-            await fetch(CLOUD_STORAGE_URL, {
+            await fetch(CLOUD_EVENTS_URL, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: jsonStr
@@ -988,7 +1092,82 @@
           if (label) label.textContent = text;
         }
 
-        // --- Render Calendar ---
+        // --- Event Listeners ---
+
+        bindEvents() {
+          // Month navigation
+          this.btnPrev.addEventListener('click', () => {
+            this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+            this.render();
+          });
+          this.btnNext.addEventListener('click', () => {
+            this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+            this.render();
+          });
+          this.btnToday.addEventListener('click', () => {
+            this.currentDate = new Date();
+            this.render();
+          });
+
+          // Profile badge click
+          this.userProfileBtn.addEventListener('click', () => {
+            this.openAuthModal(false);
+          });
+
+          // Auth name typing -> check if existing user
+          this.authNameInput.addEventListener('input', (e) => {
+            this.checkExistingUser(e.target.value);
+          });
+
+          // Auth Form submit
+          this.authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = this.authNameInput.value;
+            const emoji = this.authSelectedEmoji.value;
+            if (name.trim()) {
+              this.saveUserProfile(name, emoji);
+            }
+          });
+
+          this.btnCloseAuthModal.addEventListener('click', () => this.closeAuthModal());
+          this.authModal.addEventListener('click', (e) => {
+            if (e.target === this.authModal && this.user.name) this.closeAuthModal();
+          });
+
+          // Day Events Modal
+          this.btnCloseDayModal.addEventListener('click', () => this.closeDayModal());
+          this.dayEventsModal.addEventListener('click', (e) => {
+            if (e.target === this.dayEventsModal) this.closeDayModal();
+          });
+
+          // Toggle add form inside day modal
+          this.btnShowAddForm.addEventListener('click', () => {
+            this.btnShowAddForm.style.display = 'none';
+            this.dayAddForm.style.display = 'flex';
+            this.newEventTitleInput.value = '';
+            this.newEventTitleInput.focus();
+          });
+
+          this.btnCancelAddEvent.addEventListener('click', () => {
+            this.dayAddForm.style.display = 'none';
+            this.btnShowAddForm.style.display = 'block';
+          });
+
+          // Add event submit
+          this.dayAddForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleAddEventSubmit();
+          });
+
+          window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+              this.closeDayModal();
+              if (this.user.name) this.closeAuthModal();
+            }
+          });
+        }
+
+        // --- Render Calendar Grid ---
 
         render() {
           const year = this.currentDate.getFullYear();
@@ -998,8 +1177,8 @@
           this.daysGridEl.innerHTML = '';
 
           const firstDay = new Date(year, month, 1);
-          let startDayOfWeek = firstDay.getDay(); // 0-Вс, 1-Пн...
-          startDayOfWeek = (startDayOfWeek === 0 ? 6 : startDayOfWeek - 1); // 0-Пн, 6-Вс
+          let startDayOfWeek = firstDay.getDay();
+          startDayOfWeek = (startDayOfWeek === 0 ? 6 : startDayOfWeek - 1);
 
           const daysInMonth = new Date(year, month + 1, 0).getDate();
           const daysInPrevMonth = new Date(year, month, 0).getDate();
@@ -1028,124 +1207,157 @@
             const cell = document.createElement('div');
             cell.className = `day-cell ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}`;
 
+            const dayEvents = (this.events || []).filter(e => e && e.date === dateISO);
+
             cell.innerHTML = `
               <div class="day-number-row">
                 <span class="day-number">${cellDate.getDate()}</span>
+                ${dayEvents.length > 0 ? `<span class="day-events-count">${dayEvents.length}</span>` : ''}
                 <span class="day-add-hint">+</span>
               </div>
               <div class="events-container"></div>
             `;
 
-            // Filter events for this cell
-            const dayEvents = (this.events || []).filter(e => e && e.date === dateISO);
             const container = cell.querySelector('.events-container');
 
-            dayEvents.forEach(evt => {
+            // Render up to 3 events preview in cell
+            dayEvents.slice(0, 3).forEach(evt => {
               const item = document.createElement('div');
               item.className = 'event-item';
-              
               const emojiIcon = evt.emoji || '📌';
-              const authorText = evt.author ? ` (от ${evt.author})` : '';
-              item.title = `${evt.title}${authorText}`;
-
               item.innerHTML = `
                 <span class="event-emoji">${emojiIcon}</span>
                 <span class="event-title-text">${this.escapeHtml(evt.title)}</span>
               `;
-
-              // Click existing event -> Edit / Delete
-              item.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.openEditModal(evt, cellDate);
-              });
               container.appendChild(item);
             });
 
-            // Click cell -> Add new event to this date
+            if (dayEvents.length > 3) {
+              const more = document.createElement('div');
+              more.style.fontSize = '0.7rem';
+              more.style.color = 'var(--primary)';
+              more.style.fontWeight = '600';
+              more.textContent = `+ ещё ${dayEvents.length - 3}`;
+              container.appendChild(more);
+            }
+
+            // Click cell -> Open day view modal!
             cell.addEventListener('click', () => {
               if (!this.user.name) {
                 this.openAuthModal(true);
                 return;
               }
-              this.openAddModal(dateISO, cellDate);
+              this.openDayModal(dateISO, cellDate);
             });
 
             this.daysGridEl.appendChild(cell);
           }
         }
 
-        // --- Event Modals ---
+        // --- Day View Modal (Shows Events + Add Button) ---
 
-        openAddModal(dateISO, cellDate) {
-          this.eventForm.reset();
-          this.eventIdInput.value = '';
-          this.eventDateInput.value = dateISO;
-          this.eventAuthorMeta.style.display = 'none';
-
+        openDayModal(dateISO, cellDate) {
+          this.activeDayISO = dateISO;
           const d = cellDate || new Date(dateISO);
-          this.modalTitle.textContent = `Событие на ${d.getDate()} ${MONTH_NAMES_GENITIVE[d.getMonth()]}`;
-          this.btnDeleteEvent.style.display = 'none';
+          this.dayModalTitle.textContent = `📅 ${d.getDate()} ${MONTH_NAMES_GENITIVE[d.getMonth()]} ${d.getFullYear()}`;
 
-          this.eventModal.classList.remove('hidden');
-          this.eventModal.style.display = 'flex';
-          setTimeout(() => this.eventTitleInput.focus(), 50);
+          // Reset add form view
+          this.dayAddForm.style.display = 'none';
+          this.btnShowAddForm.style.display = 'block';
+
+          this.renderDayEvents(dateISO);
+
+          this.dayEventsModal.classList.remove('hidden');
+          this.dayEventsModal.style.display = 'flex';
         }
 
-        openEditModal(evt, cellDate) {
-          this.eventIdInput.value = evt.id;
-          this.eventDateInput.value = evt.date;
-          this.eventTitleInput.value = evt.title;
+        closeDayModal() {
+          this.dayEventsModal.classList.add('hidden');
+          this.dayEventsModal.style.display = 'none';
+          this.activeDayISO = null;
+        }
 
-          const d = cellDate || new Date(evt.date);
-          this.modalTitle.textContent = `Редактировать (${d.getDate()} ${MONTH_NAMES_GENITIVE[d.getMonth()]})`;
-          this.btnDeleteEvent.style.display = 'inline-flex';
+        renderDayEvents(dateISO) {
+          this.dayEventsList.innerHTML = '';
+          const dayEvents = (this.events || []).filter(e => e && e.date === dateISO);
 
-          if (evt.author) {
-            this.eventAuthorMeta.innerHTML = `<span>Автор:</span> <strong>${evt.emoji || '📌'} ${this.escapeHtml(evt.author)}</strong>`;
-            this.eventAuthorMeta.style.display = 'flex';
-          } else {
-            this.eventAuthorMeta.style.display = 'none';
+          if (dayEvents.length === 0) {
+            this.dayEventsList.innerHTML = `
+              <div class="empty-events-msg">
+                На этот день пока нет событий.<br>Нажмите кнопку ниже, чтобы добавить!
+              </div>
+            `;
+            return;
           }
 
-          this.eventModal.classList.remove('hidden');
-          this.eventModal.style.display = 'flex';
-          setTimeout(() => this.eventTitleInput.focus(), 50);
+          dayEvents.forEach(evt => {
+            const card = document.createElement('div');
+            card.className = 'day-event-card';
+
+            const authorEmoji = evt.emoji || '📌';
+            const authorName = evt.author || 'Пользователь';
+
+            card.innerHTML = `
+              <div class="day-event-info">
+                <span class="day-event-author-badge" title="Автор: ${this.escapeHtml(authorName)}">
+                  <span>${authorEmoji}</span>
+                  <span>${this.escapeHtml(authorName)}</span>
+                </span>
+                <span class="day-event-title">${this.escapeHtml(evt.title)}</span>
+              </div>
+              <div class="day-event-actions">
+                <button type="button" class="btn-icon edit-btn" title="Редактировать">✏️</button>
+                <button type="button" class="btn-icon delete delete-btn" title="Удалить">🗑️</button>
+              </div>
+            `;
+
+            // Edit event
+            card.querySelector('.edit-btn').addEventListener('click', () => {
+              const newTitle = prompt('Изменить название события:', evt.title);
+              if (newTitle !== null && newTitle.trim().length > 0) {
+                evt.title = newTitle.trim();
+                this.render();
+                this.renderDayEvents(dateISO);
+                this.saveEventsToStorage();
+                this.showToast('Событие изменено');
+              }
+            });
+
+            // Delete event
+            card.querySelector('.delete-btn').addEventListener('click', () => {
+              if (confirm(`Удалить событие «${evt.title}»?`)) {
+                this.deleteEvent(evt.id);
+                this.renderDayEvents(dateISO);
+              }
+            });
+
+            this.dayEventsList.appendChild(card);
+          });
         }
 
-        closeModal() {
-          this.eventModal.classList.add('hidden');
-          this.eventModal.style.display = 'none';
-        }
+        handleAddEventSubmit() {
+          const title = this.newEventTitleInput.value.trim();
+          if (!title || !this.activeDayISO) return;
 
-        handleFormSubmit() {
-          const title = this.eventTitleInput.value.trim();
-          const date = this.eventDateInput.value;
-          const id = this.eventIdInput.value;
+          const newEvent = {
+            id: 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+            date: this.activeDayISO,
+            title: title,
+            author: this.user.name || 'Пользователь',
+            emoji: this.user.emoji || '🚀'
+          };
 
-          if (!title || !date) return;
+          this.events.push(newEvent);
+          this.newEventTitleInput.value = '';
 
-          if (id) {
-            const index = this.events.findIndex(e => e.id === id);
-            if (index !== -1) {
-              this.events[index].title = title;
-              this.events[index].date = date;
-              this.showToast('Событие изменено');
-            }
-          } else {
-            const newEvent = {
-              id: 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-              date,
-              title,
-              author: this.user.name || 'Пользователь',
-              emoji: this.user.emoji || '🚀'
-            };
-            this.events.push(newEvent);
-            this.showToast('Событие добавлено');
-          }
-
-          this.closeModal();
+          // Keep form ready or hide
           this.render();
+          this.renderDayEvents(this.activeDayISO);
           this.saveEventsToStorage();
+          this.showToast('Событие добавлено!');
+
+          // Return focus to input for adding more
+          this.newEventTitleInput.focus();
         }
 
         deleteEvent(id) {
