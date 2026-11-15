@@ -1,4 +1,4 @@
-/* Simple & Clean Calendar Styles */
+/* Стили календаря PlanSphere */
 :root {
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
@@ -33,15 +33,14 @@ body {
   padding: 16px;
 }
 
-/* Wrapper */
 .calendar-wrapper {
-  max-width: 1100px;
+  max-width: 1000px;
   width: 100%;
   margin: 0 auto;
   background: var(--bg-card);
   border-radius: 16px;
   border: 1px solid var(--border);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -63,6 +62,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .app-title {
@@ -76,10 +76,11 @@ body {
   align-items: center;
   gap: 6px;
   font-size: 0.75rem;
-  padding: 3px 8px;
+  padding: 4px 10px;
   border-radius: 20px;
   background: #f1f5f9;
   color: var(--text-muted);
+  font-weight: 500;
 }
 .sync-dot {
   width: 8px;
@@ -103,13 +104,13 @@ body {
 .header-nav {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .nav-arrows {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: #f8fafc;
   padding: 4px 8px;
   border-radius: 10px;
@@ -134,9 +135,15 @@ body {
 
 .month-title {
   font-size: 1rem;
-  font-weight: 600;
-  min-width: 140px;
+  font-weight: 700;
+  min-width: 150px;
   text-align: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Buttons */
@@ -176,15 +183,18 @@ body {
   background: #fecaca;
   color: var(--danger-hover);
 }
+.btn-sm {
+  font-size: 0.75rem;
+  padding: 5px 10px;
+}
 
-/* Calendar Container */
+/* Calendar Grid */
 .calendar-container {
   display: flex;
   flex-direction: column;
   overflow-x: auto;
 }
 
-/* Weekday header row */
 .weekdays-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -192,7 +202,7 @@ body {
   border-bottom: 1px solid var(--border);
   text-align: center;
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-muted);
   padding: 10px 0;
 }
@@ -200,7 +210,6 @@ body {
   color: var(--weekend-color);
 }
 
-/* Month Days Grid */
 .days-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -209,7 +218,6 @@ body {
   gap: 1px;
 }
 
-/* Single Day Cell */
 .day-cell {
   background: #ffffff;
   padding: 6px 8px;
@@ -223,7 +231,6 @@ body {
 .day-cell:hover {
   background: #f8fafc;
 }
-
 .day-cell.other-month {
   background: #fafafa;
   opacity: 0.45;
@@ -238,24 +245,24 @@ body {
 
 .day-number {
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
 }
-
 .day-cell.today .day-number {
   background: var(--primary);
   color: #ffffff;
 }
 
 .day-add-hint {
-  font-size: 0.9rem;
-  color: var(--text-light);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
   opacity: 0;
   transition: opacity 0.15s;
 }
@@ -263,11 +270,10 @@ body {
   opacity: 1;
 }
 
-/* Event List inside Cell */
 .events-container {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   overflow-y: auto;
   max-height: 90px;
 }
@@ -281,11 +287,12 @@ body {
   border-radius: 4px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
+  font-weight: 500;
   transition: transform 0.1s, filter 0.15s;
 }
 .event-item:hover {
@@ -297,18 +304,18 @@ body {
   font-weight: 700;
   font-size: 0.7rem;
   opacity: 0.85;
+  flex-shrink: 0;
 }
-
 .event-title {
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Modal Backdrop & Card */
+/* Modal */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(15, 23, 42, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -317,23 +324,23 @@ body {
   backdrop-filter: blur(2px);
 }
 .modal-backdrop.hidden {
-  display: none;
+  display: none !important;
 }
 
 .modal-card {
   background: #ffffff;
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
   border-radius: 14px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
   overflow: hidden;
-  animation: modalEnter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modalEnter 0.15s ease-out;
 }
 
 @keyframes modalEnter {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.97);
+    transform: translateY(10px) scale(0.98);
   }
   to {
     opacity: 1;
@@ -367,7 +374,6 @@ body {
   background: #f1f5f9;
 }
 
-/* Form */
 #eventForm {
   padding: 20px;
   display: flex;
@@ -380,13 +386,11 @@ body {
   flex-direction: column;
   gap: 6px;
 }
-
 .form-group label {
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--text-muted);
 }
-
 .form-group input {
   font-size: 0.9375rem;
   padding: 10px 12px;
@@ -411,7 +415,6 @@ body {
   padding-top: 16px;
   border-top: 1px solid var(--border);
 }
-
 .actions-right {
   display: flex;
   align-items: center;
@@ -419,7 +422,25 @@ body {
   margin-left: auto;
 }
 
-/* Toast Notification */
+/* Footer Tools */
+.calendar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: #fafafa;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.footer-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Toast */
 .toast {
   position: fixed;
   bottom: 24px;
@@ -432,17 +453,13 @@ body {
   font-weight: 500;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
   z-index: 200;
-  animation: toastFade 0.25s ease;
+  transition: opacity 0.2s;
 }
 .toast.hidden {
   display: none;
 }
-@keyframes toastFade {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 
-/* Mobile responsive */
+/* Mobile */
 @media (max-width: 640px) {
   body {
     padding: 8px;
