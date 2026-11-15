@@ -1,0 +1,152 @@
+/* Custom styles for PlanSphere Calendar */
+
+/* Smooth scroll & base transitions */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.7);
+}
+
+/* Calendar month cell */
+.month-day-cell {
+  min-height: 95px;
+  transition: background-color 0.15s ease;
+}
+.month-day-cell:hover {
+  background-color: rgba(99, 102, 241, 0.04);
+}
+.dark .month-day-cell:hover {
+  background-color: rgba(99, 102, 241, 0.08);
+}
+
+/* Outside month cell */
+.month-day-outside {
+  opacity: 0.38;
+}
+
+/* Active view button styling */
+.view-btn.active {
+  background-color: #ffffff;
+  color: #4f46e5;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+.dark .view-btn.active {
+  background-color: #1e293b;
+  color: #818cf8;
+}
+
+/* Priority filter active state */
+.priority-btn.active {
+  ring-width: 2px;
+  outline: 2px solid #6366f1;
+  outline-offset: 1px;
+}
+
+/* Event badge */
+.event-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.event-badge:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+}
+
+/* Completed event strikethrough styling */
+.event-badge.completed,
+.kanban-card.completed {
+  opacity: 0.65;
+}
+.event-badge.completed .event-title-text {
+  text-decoration: line-through;
+}
+
+/* Kanban card styling */
+.kanban-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: grab;
+}
+.kanban-card:active {
+  cursor: grabbing;
+}
+.kanban-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+}
+
+/* Toast animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+.toast-enter {
+  animation: slideInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.toast-exit {
+  animation: fadeOut 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Color dot selector */
+.color-dot {
+  transition: transform 0.15s ease;
+}
+.color-dot:hover {
+  transform: scale(1.15);
+}
+
+/* Print styles */
+@media print {
+  header, aside, #btnOpenAddModal, .view-btn, #themeToggleBtn {
+    display: none !important;
+  }
+  body, main {
+    background: white !important;
+    color: black !important;
+    overflow: visible !important;
+  }
+  .calendar-view {
+    display: block !important;
+  }
+}

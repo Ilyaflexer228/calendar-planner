@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ru" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Календарь Планирования | PlanSphere</title>
+  <meta name="description" content="Интерактивный календарь с планированием событий, сроками, категориями и отслеживанием дедлайнов">
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='18' height='18' x='3' y='4' rx='2'/><path d='M16 2v4'/><path d='M8 2v4'/><path d='M3 10h18'/><path d='M8 14h.01'/><path d='M12 14h.01'/><path d='M16 14h.01'/><path d='M8 18h.01'/><path d='M12 18h.01'/></svg>">
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="h-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased flex flex-col transition-colors duration-200">
+
+  <!-- TOP APP HEADER -->
+  <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 lg:px-6 py-3 transition-colors">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Brand & Mobile Toggle -->
+      <div class="flex items-center gap-3">
+        <button id="toggleSidebarBtn" class="lg:hidden p-2 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Открыть меню">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+            <i data-lucide="calendar" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400">
+              PlanSphere
+            </h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:block">Календарь и планирование событий</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Date Navigator & Title -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button id="btnToday" class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/70 text-slate-700 dark:text-slate-200 shadow-sm transition">
+          Сегодня
+        </button>
+        <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700">
+          <button id="btnPrev" class="p-1.5 rounded-md hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition" title="Предыдущий период">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+          </button>
+          <button id="btnNext" class="p-1.5 rounded-md hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition" title="Следующий период">
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+        <h2 id="currentPeriodLabel" class="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 min-w-[140px] sm:min-w-[170px] text-center select-none">
+          Ноябрь 2026
+        </h2>
+      </div>
+
+      <!-- Right Actions: View Switcher, New Event, Theme -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Search bar (desktop) -->
+        <div class="relative hidden md:block w-48 lg:w-64">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input type="text" id="searchInput" placeholder="Поиск событий..." class="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-lg bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition">
+        </div>
+
+        <!-- Add Event Button -->
+        <button id="btnOpenAddModal" class="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-lg shadow-md shadow-indigo-600/25 transition">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Событие</span>
+        </button>
+
+        <!-- Dark/Light Theme Toggle -->
+        <button id="themeToggleBtn" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition" title="Переключить тему">
+          <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+          <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <div class="flex-1 flex max-w-7xl w-full mx-auto p-3 sm:p-4 lg:p-6 gap-6 overflow-hidden">
+    
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 sm:w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 overflow-y-auto transform -translate-x-full lg:translate-x-0 lg:static lg:block lg:w-64 lg:p-0 lg:bg-transparent lg:dark:bg-transparent lg:border-none transition-transform duration-300 flex-shrink-0">
+      
+      <div class="flex items-center justify-between lg:hidden mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+        <span class="font-bold text-slate-800 dark:text-white">Панель управления</span>
+        <button id="closeSidebarBtn" class="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Mobile search -->
+      <div class="relative md:hidden mb-4">
+        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+        <input type="text" id="mobileSearchInput" placeholder="Поиск событий..." class="w-full pl-9 pr-3 py-1.5 text-sm rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+
+      <!-- Mini Calendar -->
+      <div class="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200 dark:border-slate-800 shadow-sm mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <h3 id="miniMonthLabel" class="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+            Ноябрь 2026
+          </h3>
+          <div class="flex items-center gap-1">
+            <button id="miniPrev" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+              <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+            </button>
+            <button id="miniNext" class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+        <!-- Days header -->
+        <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-semibold text-slate-400 mb-1">
+          <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
+        </div>
+        <!-- Mini days grid -->
+        <div id="miniCalendarGrid" class="grid grid-cols-7 gap-1 text-xs">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Quick Planning Stats Card -->
+      <div class="bg-white dark:bg-slate-900 rounded-xl p-3.5 border border-slate-200 dark:border-slate-800 shadow-sm mb-4">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 flex items-center justify-between">
+          <span>Статистика планов</span>
+          <i data-lucide="trending-up" class="w-4 h-4 text-indigo-500"></i>
+        </h3>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="bg-indigo-50 dark:bg-indigo-950/40 p-2 rounded-lg border border-indigo-100 dark:border-indigo-900/50">
+            <div id="statTotal" class="text-lg font-bold text-indigo-600 dark:text-indigo-400">0</div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Всего</div>
+          </div>
+          <div class="bg-amber-50 dark:bg-amber-950/40 p-2 rounded-lg border border-amber-100 dark:border-amber-900/50">
+            <div id="statPlanned" class="text-lg font-bold text-amber-600 dark:text-amber-400">0</div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">В плане</div>
+          </div>
+          <div class="bg-emerald-50 dark:bg-emerald-950/40 p-2 rounded-lg border border-emerald-100 dark:border-emerald-900/50">
+            <div id="statDone" class="text-lg font-bold text-emerald-600 dark:text-emerald-400">0</div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Готово</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Filter -->
+      <div class="bg-white dark:bg-slate-900 rounded-xl p-3.5 border border-slate-200 dark:border-slate-800 shadow-sm mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Категории</h3>
+          <button id="resetCategoryFilter" class="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline">Все</button>
+        </div>
+        <div id="categoryFilterList" class="space-y-1.5 text-xs font-medium">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Priority Filter -->
+      <div class="bg-white dark:bg-slate-900 rounded-xl p-3.5 border border-slate-200 dark:border-slate-800 shadow-sm mb-4">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Приоритет</h3>
+        <div class="flex flex-wrap gap-1.5" id="priorityFilters">
+          <button data-priority="all" class="priority-btn active px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Все</button>
+          <button data-priority="critical" class="priority-btn px-2.5 py-1 rounded-md text-xs font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40">Срочно</button>
+          <button data-priority="high" class="priority-btn px-2.5 py-1 rounded-md text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/40">Высокий</button>
+          <button data-priority="medium" class="priority-btn px-2.5 py-1 rounded-md text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/40">Обычный</button>
+        </div>
+      </div>
+
+      <!-- Data Export / Import Actions -->
+      <div class="bg-white dark:bg-slate-900 rounded-xl p-3.5 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Данные и экспорт</h3>
+        <button id="btnExportIcal" class="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/50 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 transition">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          Экспорт в iCal (.ics)
+        </button>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="btnExportJson" class="flex items-center justify-center gap-1.5 px-2 py-1.5 text-[11px] font-medium rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition">
+            <i data-lucide="file-json" class="w-3.5 h-3.5"></i>
+            Экспорт JSON
+          </button>
+          <label class="cursor-pointer flex items-center justify-center gap-1.5 px-2 py-1.5 text-[11px] font-medium rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition">
+            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+            Импорт JSON
+            <input type="file" id="importJsonInput" accept=".json" class="hidden">
+          </label>
+        </div>
+        <button id="btnResetData" class="w-full text-center text-[10px] text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 pt-1 transition">
+          Восстановить демо-события
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- BACKDROP FOR MOBILE SIDEBAR -->
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-slate-900/50 z-30 hidden lg:hidden backdrop-blur-xs"></div>
+
+    <!-- MAIN CALENDAR WORKSPACE -->
+    <main class="flex-1 flex flex-col min-w-0 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      
+      <!-- View Mode Tabs Bar -->
+      <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/50">
+        
+        <!-- View switchers -->
+        <div class="inline-flex p-1 bg-slate-200/70 dark:bg-slate-800 rounded-xl text-xs font-semibold">
+          <button data-view="month" class="view-btn active px-3 py-1.5 rounded-lg transition shadow-xs">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+              Месяц
+            </span>
+          </button>
+          <button data-view="week" class="view-btn px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="calendar-range" class="w-3.5 h-3.5"></i>
+              Неделя
+            </span>
+          </button>
+          <button data-view="day" class="view-btn px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="calendar-day" class="w-3.5 h-3.5"></i>
+              День
+            </span>
+          </button>
+          <button data-view="planning" class="view-btn px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="check-square" class="w-3.5 h-3.5"></i>
+              Доска планов
+            </span>
+          </button>
+          <button data-view="agenda" class="view-btn px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="list-todo" class="w-3.5 h-3.5"></i>
+              Расписание
+            </span>
+          </button>
+        </div>
+
+        <!-- Filter Status indicator / quick search feedback -->
+        <div id="activeFilterBadge" class="hidden text-xs px-2.5 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-medium items-center gap-1.5">
+          <span>Фильтр активен</span>
+          <button id="clearFiltersBtn" class="hover:text-indigo-900 dark:hover:text-white font-bold">&times;</button>
+        </div>
+      </div>
+
+      <!-- CALENDAR VIEWS CONTAINER -->
+      <div class="flex-1 overflow-auto relative">
+        
+        <!-- 1. MONTH VIEW -->
+        <div id="viewMonth" class="calendar-view h-full flex flex-col min-w-[700px] lg:min-w-0">
+          <!-- Weekday Headers -->
+          <div class="grid grid-cols-7 border-b border-slate-200 dark:border-slate-800 bg-slate-100/60 dark:bg-slate-800/40 text-xs font-semibold text-slate-600 dark:text-slate-300 text-center py-2.5">
+            <div>Понедельник</div>
+            <div>Вторник</div>
+            <div>Среда</div>
+            <div>Четверг</div>
+            <div>Пятница</div>
+            <div class="text-indigo-600 dark:text-indigo-400">Суббота</div>
+            <div class="text-indigo-600 dark:text-indigo-400">Воскресенье</div>
+          </div>
+          <!-- Days Grid (6 rows x 7 cols) -->
+          <div id="monthGrid" class="flex-1 grid grid-cols-7 grid-rows-6 divide-x divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900 min-h-[560px]">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- 2. WEEK VIEW -->
+        <div id="viewWeek" class="calendar-view h-full flex-col hidden min-w-[750px]">
+          <!-- Weekday Headers with dates -->
+          <div id="weekHeaderGrid" class="grid grid-cols-8 border-b border-slate-200 dark:border-slate-800 bg-slate-100/60 dark:bg-slate-800/40 text-xs font-semibold py-2.5 text-center">
+            <div class="text-slate-400">Время</div>
+            <!-- 7 days populated by JS -->
+          </div>
+          <!-- Hourly Slots Body -->
+          <div class="flex-1 overflow-y-auto">
+            <div id="weekBodyGrid" class="grid grid-cols-8 divide-x divide-slate-200 dark:divide-slate-800">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. DAY VIEW -->
+        <div id="viewDay" class="calendar-view h-full flex-col hidden p-4 overflow-y-auto max-w-4xl mx-auto w-full">
+          <div id="dayViewHeader" class="mb-4 pb-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <!-- Rendered by JS -->
+          </div>
+          <div id="dayTimeline" class="space-y-3">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- 4. PLANNING BOARD VIEW (Kanban by Status & Deadlines) -->
+        <div id="viewPlanning" class="calendar-view h-full flex-col hidden p-4 overflow-x-auto">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-base font-bold text-slate-800 dark:text-white">Доска планирования и контроля сроков</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">События с фиксированными датами планирования и обратным отсчётом</p>
+            </div>
+            <button id="btnNewPlanningItem" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              Добавить цель/план
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 items-start min-h-[500px]">
+            <!-- Column 1: Planned -->
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3.5 border border-slate-200 dark:border-slate-800 flex flex-col h-full">
+              <div class="flex items-center justify-between mb-3">
+                <span class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                  Запланировано
+                </span>
+                <span id="planCountScheduled" class="text-xs px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-bold">0</span>
+              </div>
+              <div id="columnScheduled" class="space-y-2.5 flex-1 overflow-y-auto pr-1 kanban-col" data-status="scheduled">
+                <!-- Cards -->
+              </div>
+            </div>
+
+            <!-- Column 2: In Progress -->
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3.5 border border-slate-200 dark:border-slate-800 flex flex-col h-full">
+              <div class="flex items-center justify-between mb-3">
+                <span class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                  В процессе
+                </span>
+                <span id="planCountInProgress" class="text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 font-bold">0</span>
+              </div>
+              <div id="columnInProgress" class="space-y-2.5 flex-1 overflow-y-auto pr-1 kanban-col" data-status="in-progress">
+                <!-- Cards -->
+              </div>
+            </div>
+
+            <!-- Column 3: Completed -->
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3.5 border border-slate-200 dark:border-slate-800 flex flex-col h-full">
+              <div class="flex items-center justify-between mb-3">
+                <span class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                  Завершено
+                </span>
+                <span id="planCountCompleted" class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-bold">0</span>
+              </div>
+              <div id="columnCompleted" class="space-y-2.5 flex-1 overflow-y-auto pr-1 kanban-col" data-status="completed">
+                <!-- Cards -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. AGENDA / LIST VIEW -->
+        <div id="viewAgenda" class="calendar-view h-full flex-col hidden p-4 overflow-y-auto max-w-4xl mx-auto w-full">
+          <div class="mb-4 pb-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <h2 class="text-base font-bold text-slate-800 dark:text-white">Хронологическое расписание всех событий</h2>
+            <span id="agendaCountBadge" class="text-xs px-2.5 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-semibold">0 событий</span>
+          </div>
+          <div id="agendaList" class="space-y-4">
+            <!-- Grouped by date -->
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- EVENT CREATE / EDIT MODAL -->
+  <div id="eventModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg max-h-[90vh] overflow-y-auto transform transition-all">
+      
+      <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-800">
+        <h3 id="modalTitle" class="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
+          <i data-lucide="calendar-plus" class="w-5 h-5 text-indigo-600 dark:text-indigo-400"></i>
+          Новое событие
+        </h3>
+        <button id="closeModalBtn" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="eventForm" class="p-5 space-y-4">
+        <input type="hidden" id="eventId">
+
+        <!-- Title -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1" for="eventTitleInput">
+            Название события / задачи <span class="text-rose-500">*</span>
+          </label>
+          <input type="text" id="eventTitleInput" required placeholder="Например: Запуск нового проекта" class="w-full px-3.5 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900">
+        </div>
+
+        <!-- Planning Date & Time Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1" for="eventStartDateInput">
+              Дата и время начала <span class="text-rose-500">*</span>
+            </label>
+            <input type="datetime-local" id="eventStartDateInput" required class="w-full px-3 py-1.5 text-sm rounded-lg bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1" for="eventEndDateInput">
+              Дата и время окончания
+            </label>
+            <input type="datetime-local" id="eventEndDateInput" class="w-full px-3 py-1.5 text-sm rounded-lg bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+
+        <!-- Planning Target / Deadline date -->
+        <div class="bg-indigo-50/70 dark:bg-indigo-950/30 p-3 rounded-xl border border-indigo-100 dark:border-indigo-900/40">
+          <label class="block text-xs font-semibold text-indigo-900 dark:text-indigo-300 mb-1 flex items-center justify-between" for="eventDeadlineInput">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="target" class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400"></i>
+              Целевой срок планирования (Дедлайн)
+            </span>
+            <span class="text-[10px] text-indigo-500 dark:text-indigo-400 font-normal">Для расчёта оставшихся дней</span>
+          </label>
+          <input type="date" id="eventDeadlineInput" class="w-full px-3 py-1.5 text-sm rounded-lg bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <!-- Category & Priority Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1" for="eventCategorySelect">
+              Категория
+            </label>
+            <select id="eventCategorySelect" class="w-full px-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="work">💼 Работа</option>
+              <option value="personal">🌟 Личное</option>
+              <option value="study">📚 Учёба</option>
+              <option value="health">🏃 Здоровье & Спорт</option>
+              <option value="goal">🎯 Цель / Веха</option>
+              <option value="meeting">🤝 Встреча</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1" for="eventPrioritySelect">
+              Приоритет
+            </label>
+            <select id="eventPrioritySelect" class="w-full px-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="low">Низкий</option>
+              <option value="medium" selected>Средний</option>
+              <option value="high">Высокий</option>
+              <option value="critical">🔥 Критический / Срочный</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Status & Accent Color Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1" for="eventStatusSelect">
+              Статус выполнения
+            </label>
+            <select id="eventStatusSelect" class="w-full px-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="scheduled">Запланировано</option>
+              <option value="in-progress">В процессе</option>
+              <option value="completed">Выполнено</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Цвет метки
+            </label>
+            <div class="flex items-center gap-2 pt-1" id="colorPickerContainer">
+              <button type="button" data-color="#6366f1" class="color-dot w-6 h-6 rounded-full bg-indigo-500 ring-2 ring-offset-2 ring-indigo-500"></button>
+              <button type="button" data-color="#3b82f6" class="color-dot w-6 h-6 rounded-full bg-blue-500"></button>
+              <button type="button" data-color="#10b981" class="color-dot w-6 h-6 rounded-full bg-emerald-500"></button>
+              <button type="button" data-color="#f59e0b" class="color-dot w-6 h-6 rounded-full bg-amber-500"></button>
+              <button type="button" data-color="#ef4444" class="color-dot w-6 h-6 rounded-full bg-rose-500"></button>
+              <button type="button" data-color="#8b5cf6" class="color-dot w-6 h-6 rounded-full bg-purple-500"></button>
+              <input type="hidden" id="eventColorInput" value="#6366f1">
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1" for="eventDescInput">
+            Описание и примечания
+          </label>
+          <textarea id="eventDescInput" rows="3" placeholder="Добавьте детальное описание, ссылки или шаги для реализации..." class="w-full px-3.5 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" id="btnDeleteEvent" class="hidden px-3 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition">
+            <i data-lucide="trash-2" class="w-4 h-4 inline-block mr-1"></i>
+            Удалить
+          </button>
+          <div class="flex items-center gap-2 ml-auto">
+            <button type="button" id="btnCancelModal" class="px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+              Отмена
+            </button>
+            <button type="submit" class="px-5 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 active:scale-95 transition">
+              Сохранить
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- EVENT DETAILS QUICK PREVIEW MODAL -->
+  <div id="viewDetailModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md overflow-hidden transform transition-all">
+      <div id="detailHeaderColor" class="h-3 w-full bg-indigo-500"></div>
+      <div class="p-5">
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <span id="detailCategoryBadge" class="text-xs px-2.5 py-0.5 rounded-full font-semibold">Категория</span>
+          <button id="closeDetailModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <h3 id="detailTitle" class="text-lg font-bold text-slate-900 dark:text-white mb-3">Название события</h3>
+        
+        <div class="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 mb-4">
+          <div class="flex items-center gap-2">
+            <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>
+            <span id="detailDates">15 ноября 2026</span>
+          </div>
+          <div id="detailDeadlineRow" class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-medium">
+            <i data-lucide="target" class="w-4 h-4"></i>
+            <span id="detailDeadline">Дедлайн планирования: 20 ноября 2026</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i data-lucide="flag" class="w-4 h-4 text-slate-400"></i>
+            <span id="detailPriority">Приоритет: Высокий</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-slate-400"></i>
+            <span id="detailStatus">Статус: Запланировано</span>
+          </div>
+        </div>
+
+        <div id="detailDescContainer" class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700/60 text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap mb-4">
+          Описание события
+        </div>
+
+        <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+          <button id="btnToggleCompleteDetail" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 dark:hover:bg-emerald-900/60 transition">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            <span>Отметить как выполненное</span>
+          </button>
+          <div class="flex items-center gap-1.5">
+            <button id="btnEditFromDetail" class="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Редактировать">
+              <i data-lucide="edit-3" class="w-4 h-4"></i>
+            </button>
+            <button id="btnExportSingleIcal" class="p-2 rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition" title="Экспорт в .ics">
+              <i data-lucide="calendar-arrow-down" class="w-4 h-4"></i>
+            </button>
+            <button id="btnDeleteFromDetail" class="p-2 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition" title="Удалить">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Script -->
+  <script src="app.js"></script>
+</body>
+</html>
