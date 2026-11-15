@@ -9,7 +9,6 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='18' height='18' x='3' y='4' rx='2'/><path d='M16 2v4'/><path d='M8 2v4'/><path d='M3 10h18'/></svg>">
 
   <style>
-    /* Встроенные стили для моментальной загрузки без сбоев кэша */
     :root {
       --primary: #2563eb;
       --primary-hover: #1d4ed8;
@@ -151,12 +150,6 @@
       text-align: center;
     }
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
     /* Buttons */
     .btn {
       font-size: 0.875rem;
@@ -224,15 +217,15 @@
     .days-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      grid-auto-rows: minmax(105px, auto);
+      grid-auto-rows: minmax(110px, auto);
       background: var(--border);
       gap: 1px;
     }
 
     .day-cell {
       background: #ffffff;
-      padding: 6px 8px;
-      min-height: 105px;
+      padding: 8px;
+      min-height: 110px;
       display: flex;
       flex-direction: column;
       cursor: pointer;
@@ -240,7 +233,7 @@
       transition: background 0.15s;
     }
     .day-cell:hover {
-      background: #f8fafc;
+      background: #f0f7ff;
     }
     .day-cell.other-month {
       background: #fafafa;
@@ -251,7 +244,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .day-number {
@@ -271,11 +264,12 @@
     }
 
     .day-add-hint {
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 700;
       color: var(--primary);
       opacity: 0;
       transition: opacity 0.15s;
+      line-height: 1;
     }
     .day-cell:hover .day-add-hint {
       opacity: 1;
@@ -286,40 +280,27 @@
       flex-direction: column;
       gap: 4px;
       overflow-y: auto;
-      max-height: 90px;
+      max-height: 95px;
     }
 
     .event-item {
       background: var(--event-bg);
       border-left: 3px solid var(--event-border);
       color: var(--event-text);
-      font-size: 0.75rem;
-      padding: 3px 6px;
+      font-size: 0.78rem;
+      padding: 4px 7px;
       border-radius: 4px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       cursor: pointer;
-      font-weight: 500;
+      font-weight: 600;
       transition: transform 0.1s, filter 0.15s;
     }
     .event-item:hover {
       transform: translateY(-1px);
       filter: brightness(0.95);
-    }
-
-    .event-time {
-      font-weight: 700;
-      font-size: 0.7rem;
-      opacity: 0.85;
-      flex-shrink: 0;
-    }
-    .event-title {
-      overflow: hidden;
-      text-overflow: ellipsis;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
     /* Modal */
@@ -341,7 +322,7 @@
     .modal-card {
       background: #ffffff;
       width: 100%;
-      max-width: 400px;
+      max-width: 380px;
       border-radius: 14px;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
       overflow: hidden;
@@ -367,8 +348,9 @@
       border-bottom: 1px solid var(--border);
     }
     .modal-header h3 {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 700;
+      color: var(--text-main);
     }
     .btn-close {
       background: none;
@@ -422,8 +404,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 8px;
-      padding-top: 16px;
+      margin-top: 4px;
+      padding-top: 14px;
       border-top: 1px solid var(--border);
     }
     .actions-right {
@@ -431,24 +413,6 @@
       align-items: center;
       gap: 8px;
       margin-left: auto;
-    }
-
-    /* Footer Tools */
-    .calendar-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 20px;
-      background: #fafafa;
-      border-top: 1px solid var(--border);
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .footer-actions {
-      display: flex;
-      gap: 8px;
     }
 
     /* Toast */
@@ -464,7 +428,6 @@
       font-weight: 500;
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
       z-index: 200;
-      transition: opacity 0.2s;
     }
     .toast.hidden {
       display: none;
@@ -479,18 +442,18 @@
         flex-direction: column;
         align-items: stretch;
       }
-      .header-left, .header-nav, .header-right {
+      .header-left, .header-nav {
         justify-content: space-between;
       }
       .days-grid {
-        grid-auto-rows: minmax(75px, auto);
+        grid-auto-rows: minmax(80px, auto);
       }
       .day-cell {
-        min-height: 75px;
+        min-height: 80px;
         padding: 4px;
       }
       .event-item {
-        font-size: 0.7rem;
+        font-size: 0.72rem;
         padding: 2px 4px;
       }
     }
@@ -517,15 +480,10 @@
           <button id="btnNext" class="btn-arrow" title="Следующий месяц">&rsaquo;</button>
         </div>
       </div>
-
-      <div class="header-right">
-        <button id="btnAddEvent" class="btn btn-primary">+ Добавить</button>
-      </div>
     </header>
 
     <!-- Calendar Grid -->
     <main class="calendar-container">
-      <!-- Weekday headers -->
       <div class="weekdays-grid">
         <div>Пн</div>
         <div>Вт</div>
@@ -541,18 +499,9 @@
         <!-- Rendered by JS -->
       </div>
     </main>
-
-    <!-- Footer Tools -->
-    <footer class="calendar-footer">
-      <span>Нажмите на любой день, чтобы добавить событие. Нажмите на событие для редактирования.</span>
-      <div class="footer-actions">
-        <button id="btnClearAll" class="btn btn-outline btn-sm">Очистить все</button>
-        <button id="btnRestoreDemo" class="btn btn-outline btn-sm">Примеры событий</button>
-      </div>
-    </footer>
   </div>
 
-  <!-- Modal (Inline style guarantees it is hidden by default) -->
+  <!-- Modal (Только название события!) -->
   <div id="eventModal" class="modal-backdrop hidden" style="display: none;">
     <div class="modal-card">
       <div class="modal-header">
@@ -562,26 +511,15 @@
 
       <form id="eventForm">
         <input type="hidden" id="eventId">
+        <input type="hidden" id="eventDate">
 
-        <!-- Date -->
-        <div class="form-group">
-          <label for="eventDate">Дата:</label>
-          <input type="date" id="eventDate" required>
-        </div>
-
-        <!-- Time -->
-        <div class="form-group">
-          <label for="eventTime">Время:</label>
-          <input type="time" id="eventTime" required>
-        </div>
-
-        <!-- Title -->
+        <!-- Title only -->
         <div class="form-group">
           <label for="eventTitle">Название события:</label>
-          <input type="text" id="eventTitle" placeholder="Например: Встреча или тренировка" required autocomplete="off">
+          <input type="text" id="eventTitle" placeholder="Что запланировано?" required autocomplete="off" autofocus>
         </div>
 
-        <!-- Modal Actions -->
+        <!-- Actions -->
         <div class="modal-actions">
           <button type="button" id="btnDeleteEvent" class="btn btn-danger" style="display: none;">Удалить</button>
           <div class="actions-right">
@@ -596,18 +534,23 @@
   <!-- Toast notification -->
   <div id="toast" class="toast hidden" style="display: none;"></div>
 
-  <!-- Встроенный скрипт для гарантированной работы без сбоев кэширования -->
+  <!-- Script -->
   <script>
     (function() {
       const CLOUD_STORAGE_URL = 'https://kvdb.io/R4sWpSfetVkvDaeMNdAVWi/events';
-      const LOCAL_STORAGE_KEY = 'simple_calendar_events_v2';
+      const LOCAL_STORAGE_KEY = 'simple_calendar_events_v3';
 
       const MONTH_NAMES = [
         'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
         'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
       ];
 
-      class CalendarApp {
+      const MONTH_NAMES_GENITIVE = [
+        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+      ];
+
+      class SimpleCalendarApp {
         constructor() {
           this.currentDate = new Date();
           this.events = [];
@@ -628,10 +571,7 @@
           this.btnPrev = document.getElementById('btnPrev');
           this.btnNext = document.getElementById('btnNext');
           this.btnToday = document.getElementById('btnToday');
-          this.btnAddEvent = document.getElementById('btnAddEvent');
           this.syncStatus = document.getElementById('syncStatus');
-          this.btnClearAll = document.getElementById('btnClearAll');
-          this.btnRestoreDemo = document.getElementById('btnRestoreDemo');
 
           // Modal
           this.eventModal = document.getElementById('eventModal');
@@ -639,7 +579,6 @@
           this.eventForm = document.getElementById('eventForm');
           this.eventIdInput = document.getElementById('eventId');
           this.eventDateInput = document.getElementById('eventDate');
-          this.eventTimeInput = document.getElementById('eventTime');
           this.eventTitleInput = document.getElementById('eventTitle');
           this.btnDeleteEvent = document.getElementById('btnDeleteEvent');
           this.btnCloseModal = document.getElementById('btnCloseModal');
@@ -661,28 +600,7 @@
             this.render();
           });
 
-          this.btnAddEvent.addEventListener('click', () => {
-            this.openAddModal(this.formatDateISO(new Date()));
-          });
-
-          // Footer buttons
-          this.btnClearAll.addEventListener('click', () => {
-            if (confirm('Очистить все события календаря?')) {
-              this.events = [];
-              this.render();
-              this.saveEventsToStorage();
-              this.showToast('Все события очищены');
-            }
-          });
-
-          this.btnRestoreDemo.addEventListener('click', () => {
-            this.events = this.getDefaultEvents();
-            this.render();
-            this.saveEventsToStorage();
-            this.showToast('Примеры событий добавлены');
-          });
-
-          // Modal close
+          // Modal controls
           this.btnCloseModal.addEventListener('click', () => this.closeModal());
           this.btnCancelModal.addEventListener('click', () => this.closeModal());
           this.eventModal.addEventListener('click', (e) => {
@@ -695,7 +613,7 @@
             this.handleFormSubmit();
           });
 
-          // Delete
+          // Delete event
           this.btnDeleteEvent.addEventListener('click', () => {
             const id = this.eventIdInput.value;
             if (id) {
@@ -712,7 +630,6 @@
         // --- Storage & Sync ---
 
         loadEvents() {
-          // 1. Быстрая загрузка из LocalStorage
           try {
             const local = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (local !== null) {
@@ -722,11 +639,8 @@
                 this.render();
               }
             }
-          } catch (e) {
-            console.warn(e);
-          }
+          } catch (e) {}
 
-          // 2. Загрузка из облака
           this.fetchCloudEvents(true);
         }
 
@@ -803,15 +717,6 @@
           if (label) label.textContent = text;
         }
 
-        getDefaultEvents() {
-          const now = new Date();
-          const dStr = this.formatDateISO(now);
-          return [
-            { id: 'evt_1', date: dStr, time: '11:00', title: 'Планирование недели' },
-            { id: 'evt_2', date: dStr, time: '15:00', title: 'Созвон с командой' }
-          ];
-        }
-
         // --- Render ---
 
         render() {
@@ -860,27 +765,27 @@
               <div class="events-container"></div>
             `;
 
-            // Filter & sort events
+            // Filter events for this cell
             const dayEvents = (this.events || []).filter(e => e && e.date === dateISO);
-            dayEvents.sort((a, b) => (a.time || '').localeCompare(b.time || ''));
-
             const container = cell.querySelector('.events-container');
+
             dayEvents.forEach(evt => {
               const item = document.createElement('div');
               item.className = 'event-item';
-              item.innerHTML = `
-                <span class="event-time">${this.escapeHtml(evt.time || '')}</span>
-                <span class="event-title">${this.escapeHtml(evt.title)}</span>
-              `;
+              item.textContent = evt.title;
+              item.title = evt.title;
+
+              // Click existing event -> Edit / Delete
               item.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.openEditModal(evt);
+                this.openEditModal(evt, cellDate);
               });
               container.appendChild(item);
             });
 
+            // Click cell -> Add new event to this date
             cell.addEventListener('click', () => {
-              this.openAddModal(dateISO);
+              this.openAddModal(dateISO, cellDate);
             });
 
             this.daysGridEl.appendChild(cell);
@@ -889,35 +794,32 @@
 
         // --- Modals ---
 
-        openAddModal(presetDate) {
+        openAddModal(dateISO, cellDate) {
           this.eventForm.reset();
           this.eventIdInput.value = '';
-          this.modalTitle.textContent = 'Новое событие';
+          this.eventDateInput.value = dateISO;
+
+          const d = cellDate || new Date(dateISO);
+          this.modalTitle.textContent = `Событие на ${d.getDate()} ${MONTH_NAMES_GENITIVE[d.getMonth()]}`;
           this.btnDeleteEvent.style.display = 'none';
 
-          this.eventDateInput.value = presetDate || this.formatDateISO(new Date());
-
-          const now = new Date();
-          const hh = String(now.getHours()).padStart(2, '0');
-          this.eventTimeInput.value = `${hh}:00`;
-
           this.eventModal.classList.remove('hidden');
           this.eventModal.style.display = 'flex';
-          this.eventTitleInput.focus();
+          setTimeout(() => this.eventTitleInput.focus(), 50);
         }
 
-        openEditModal(evt) {
+        openEditModal(evt, cellDate) {
           this.eventIdInput.value = evt.id;
-          this.modalTitle.textContent = 'Редактировать событие';
-          this.btnDeleteEvent.style.display = 'inline-flex';
-
           this.eventDateInput.value = evt.date;
-          this.eventTimeInput.value = evt.time || '12:00';
           this.eventTitleInput.value = evt.title;
+
+          const d = cellDate || new Date(evt.date);
+          this.modalTitle.textContent = `Редактировать (${d.getDate()} ${MONTH_NAMES_GENITIVE[d.getMonth()]})`;
+          this.btnDeleteEvent.style.display = 'inline-flex';
 
           this.eventModal.classList.remove('hidden');
           this.eventModal.style.display = 'flex';
-          this.eventTitleInput.focus();
+          setTimeout(() => this.eventTitleInput.focus(), 50);
         }
 
         closeModal() {
@@ -928,22 +830,20 @@
         handleFormSubmit() {
           const title = this.eventTitleInput.value.trim();
           const date = this.eventDateInput.value;
-          const time = this.eventTimeInput.value;
           const id = this.eventIdInput.value;
 
-          if (!title || !date || !time) return;
+          if (!title || !date) return;
 
           if (id) {
             const index = this.events.findIndex(e => e.id === id);
             if (index !== -1) {
-              this.events[index] = { id, date, time, title };
-              this.showToast('Событие сохранено');
+              this.events[index] = { id, date, title };
+              this.showToast('Событие изменено');
             }
           } else {
             const newEvent = {
               id: 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
               date,
-              time,
               title
             };
             this.events.push(newEvent);
@@ -969,13 +869,6 @@
           return `${year}-${month}-${day}`;
         }
 
-        escapeHtml(str) {
-          if (!str) return '';
-          const div = document.createElement('div');
-          div.textContent = str;
-          return div.innerHTML;
-        }
-
         showToast(msg) {
           this.toastEl.textContent = msg;
           this.toastEl.classList.remove('hidden');
@@ -984,17 +877,16 @@
           this.toastTimer = setTimeout(() => {
             this.toastEl.classList.add('hidden');
             this.toastEl.style.display = 'none';
-          }, 2500);
+          }, 2000);
         }
       }
 
-      // Запуск
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-          window.calendarApp = new CalendarApp();
+          window.calendarApp = new SimpleCalendarApp();
         });
       } else {
-        window.calendarApp = new CalendarApp();
+        window.calendarApp = new SimpleCalendarApp();
       }
     })();
   </script>
